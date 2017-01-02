@@ -16,10 +16,6 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.util.*;
 
-/**
- * User: Maty Grosz
- * Date: 28/Apr/2015
- */
 public class Utils {
 
     public static final String CBMS_REPOSITORY_NAME = "cloud";

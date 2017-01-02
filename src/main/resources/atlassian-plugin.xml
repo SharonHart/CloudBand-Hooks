@@ -23,10 +23,10 @@
   <component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties"/>
   <component-import key="authenticationContext" interface="com.atlassian.bitbucket.auth.AuthenticationContext" />
   <component-import key="permissions" interface="com.atlassian.bitbucket.permission.PermissionService" />
-  <repository-hook name="External Async Post Receive Hook" i18n-name-key="external-async-post-receive-hook.name" key="external-post-receive-hook" class="com.ngs.stash.externalhooks.hook.ExternalAsyncPostReceiveHook">
-    <description key="external-post-receive-hook.description">The External Async Post Receive Hook Plugin</description>
+  <repository-hook name="CloudBand Hooks" i18n-name-key="external-async-post-receive-hook.name" key="external-post-receive-hook" class="com.ngs.stash.externalhooks.hook.ExternalAsyncPostReceiveHook">
+    <description key="external-post-receive-hook.description">CloudBand Hooks</description>
     <icon>icon-example.png</icon>
-    <config-form name="External Async Post Receive Hook Config" key="external-post-receive-hook-config">
+    <config-form name="CloudBand Hooks Config" key="external-post-receive-hook-config">
       <view>com.ngs.stash.externalhooks.hook.externalprereceivehook.view</view>
       <directory location="/static/"/>
     </config-form>
