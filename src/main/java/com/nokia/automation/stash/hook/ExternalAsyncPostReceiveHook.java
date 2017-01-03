@@ -95,7 +95,7 @@ public class ExternalAsyncPostReceiveHook implements AsyncPostReceiveRepositoryH
                     log.info("Context [" + postReceiveContextId + "]: The ref is Update " + refChange.getRefId() + ". If existing pull request is closed, create a new one.");
                     boolean pullRequestClosed = true;
                     if (iterateOutgoingPullRequests(context, refChange).iterator().hasNext()){
-                            pullRequestClosed = false;
+                        pullRequestClosed = false;
                     }
 
                     if (pullRequestClosed) {
@@ -151,11 +151,11 @@ public class ExternalAsyncPostReceiveHook implements AsyncPostReceiveRepositoryH
 
         try {
 
-            String pullRequestTitle = "Pull Request created by Bitbucket hook, From " + refChange.getRefId().substring(REFS_PREFIX.length()) +" into " + toBranch;
+            String pullRequestTitle = "[AUTO] Bitbucket Pull Request. From Branch " + refChange.getRefId().substring(REFS_PREFIX.length());
 
             PullRequest pr = pullRequestService.create(
                     pullRequestTitle,
-                    "Pull Request created by Bitbucket hook: Commit done by user " + currentUser.getName() + " .\n Commit from branch " + refChange.getRefId().substring(REFS_PREFIX.length()) + " .\n Commit is about to be pushed to branch " + toBranch + " after pull request is approved",
+                    "Pull Request created by Bitbucket hook: Commit done by user " + currentUser.getName() + ".\n Commit from branch " + refChange.getRefId().substring(REFS_PREFIX.length()) + ".\n Commit is about to be pushed to branch " + toBranch + " after pull request is approved",
                     reviewersList,
                     context.getRepository(),
                     refChange.getRefId().substring(REFS_PREFIX.length()),
@@ -193,10 +193,10 @@ public class ExternalAsyncPostReceiveHook implements AsyncPostReceiveRepositoryH
 
     private Iterable<PullRequest> iterateOutgoingPullRequests(final RepositoryHookContext context, final RefChange refChange) {
         Page<PullRequest> prPage= pullRequestService.search(new PullRequestSearchRequest.Builder()
-                        .state(PullRequestState.OPEN)
-                        .fromRepositoryId(context.getRepository().getId())
-                        .fromRefId(refChange.getRefId())
-                        .build(), new PageRequestImpl(0, 100));
+                .state(PullRequestState.OPEN)
+                .fromRepositoryId(context.getRepository().getId())
+                .fromRefId(refChange.getRefId())
+                .build(), new PageRequestImpl(0, 100));
 
         return prPage.getValues();
 
