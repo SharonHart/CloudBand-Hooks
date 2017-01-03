@@ -151,11 +151,11 @@ public class ExternalAsyncPostReceiveHook implements AsyncPostReceiveRepositoryH
 
         try {
 
-            String pullRequestTitle = "Pull Request created by Bitbucket hook";
+            String pullRequestTitle = "Pull Request created by Bitbucket hook, From " + refChange.getRefId().substring(REFS_PREFIX.length()) +" into " + toBranch;
 
             PullRequest pr = pullRequestService.create(
                     pullRequestTitle,
-                    "Pull Request created by Bitbucket hook: Commit done by user " + currentUser.getName() + " ; Commit from branch " + refChange.getRefId().substring(REFS_PREFIX.length()) + " ; Commit is about to be pushed to branch " + toBranch + " after pull request is approved",
+                    "Pull Request created by Bitbucket hook: Commit done by user " + currentUser.getName() + " .\n Commit from branch " + refChange.getRefId().substring(REFS_PREFIX.length()) + " .\n Commit is about to be pushed to branch " + toBranch + " after pull request is approved",
                     reviewersList,
                     context.getRepository(),
                     refChange.getRefId().substring(REFS_PREFIX.length()),
