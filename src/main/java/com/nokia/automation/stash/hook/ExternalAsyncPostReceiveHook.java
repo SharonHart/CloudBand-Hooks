@@ -26,20 +26,20 @@ public class ExternalAsyncPostReceiveHook implements AsyncPostReceiveRepositoryH
     private AuthenticationContext authCtx;
     private UserService userService = null;
     private MailService mailService;
-    private PermissionAdminService repoPermissionService = null;
+    private PermissionService permissionService = null;
     private PullRequestService pullRequestService = null;
 
     public ExternalAsyncPostReceiveHook(
             AuthenticationContext authenticationContext,
             UserService userService,
             MailService mailService,
-            PermissionAdminService repoPermissionService,
+            PermissionService permissionService,
             PullRequestService pullRequestService
     ) {
         this.authCtx = authenticationContext;
         this.userService = userService;
         this.mailService = mailService;
-        this.repoPermissionService = repoPermissionService;
+        this.permissionService = permissionService;
         this.pullRequestService = pullRequestService;
 
     }
@@ -62,11 +62,14 @@ public class ExternalAsyncPostReceiveHook implements AsyncPostReceiveRepositoryH
 
                 String toBranch = branchName.substring(0, branchName.indexOf(STG_PATTERN.toString()));
 
-                Page<PermittedGroup> groupsPage = repoPermissionService.findGroupsWithRepositoryPermission(context.getRepository(), BITBUCKET_REVIEWER_GROUP, new PageRequestImpl(0, 100));
-                Iterator<PermittedGroup> tempIter = groupsPage.getValues().iterator();
+                Page<String> groupsPage = permissionService.getGrantedGroups(Permission.PROJECT_READ, new PageRequestImpl(0, 100));
+                Iterator<String> tempIter = groupsPage.getValues().iterator();
                 Set<String> groupNames = new HashSet<String>();
                 while (tempIter.hasNext()) {
-                    groupNames.add(tempIter.next().getGroup());
+                    String groupName = tempIter.next();
+                    if (groupName.contains(BITBUCKET_REVIEWER_GROUP)){
+                        groupNames.add(groupName);
+                    }
                 }
 
 
