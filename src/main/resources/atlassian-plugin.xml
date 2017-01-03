@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<atlassian-plugin key="com.ngs.stash.externalhooks.external-hooks" name="${project.name}" plugins-version="2">
+<atlassian-plugin key="com.nokia.automation.stash.hook" name="${project.name}" plugins-version="2">
   <plugin-info>
     <description>${project.description}</description>
     <version>${project.version}</version>
-    <vendor name="${project.organization.name}" url="${project.organization.url}"/>
+    <vendor name="NOKIA" url="https://networks.nokia.com/solutions/cloudband"/>
     <param name="atlassian-data-center-compatible">true</param>
     <param name="plugin-icon">images/pluginIcon.png</param>
     <param name="plugin-logo">images/pluginLogo.png</param>
@@ -23,11 +23,11 @@
   <component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties"/>
   <component-import key="authenticationContext" interface="com.atlassian.bitbucket.auth.AuthenticationContext" />
   <component-import key="permissions" interface="com.atlassian.bitbucket.permission.PermissionService" />
-  <repository-hook name="CloudBand Hooks" i18n-name-key="external-async-post-receive-hook.name" key="external-post-receive-hook" class="com.ngs.stash.externalhooks.hook.ExternalAsyncPostReceiveHook">
-    <description key="external-post-receive-hook.description">CloudBand Hooks</description>
+  <repository-hook name="CloudBand Open PR Hook" i18n-name-key="external-async-post-receive-hook.name" key="external-post-receive-hook" class="com.nokia.automation.stash.hook.ExternalAsyncPostReceiveHook">
+    <description key="external-post-receive-hook.description">CloudBand Open PR Hook</description>
     <icon>icon-example.png</icon>
-    <config-form name="CloudBand Hooks Config" key="external-post-receive-hook-config">
-      <view>com.ngs.stash.externalhooks.hook.externalprereceivehook.view</view>
+    <config-form name="CloudBand Open PR Hook Config" key="external-post-receive-hook-config">
+      <view>com.nokia.automation.stash.hook.ExternalAsyncPostReceiveHook.view</view>
       <directory location="/static/"/>
     </config-form>
   </repository-hook>
