@@ -14,6 +14,7 @@ public class Utils {
     public static final CharSequence STG_PATTERN = "_stg_";
     public static final String REFS_PREFIX = "refs/heads/";
     public static final String BITBUCKET_REVIEWER_GROUP = "stash-reviewers";
+    public static final String BITBUCKET_ADMIN = "jenkins";
 
 
     public static void sendEmailToUser(MailService mailService,

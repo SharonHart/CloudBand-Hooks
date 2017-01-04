@@ -9,6 +9,7 @@ import com.atlassian.bitbucket.repository.*;
 import com.atlassian.bitbucket.user.*;
 import com.atlassian.bitbucket.auth.*;
 import com.atlassian.bitbucket.permission.*;
+import com.atlassian.bitbucket.util.Operation;
 import com.atlassian.bitbucket.util.Page;
 import com.atlassian.bitbucket.util.PageRequestImpl;
 
@@ -26,23 +27,41 @@ public class ExternalAsyncPostReceiveHook implements AsyncPostReceiveRepositoryH
     private AuthenticationContext authCtx;
     private UserService userService = null;
     private MailService mailService;
-    private PermissionService permissionService = null;
+    private SecurityService securityService = null;
     private PullRequestService pullRequestService = null;
+    private PermissionAdminService adminService = null;
 
     public ExternalAsyncPostReceiveHook(
             AuthenticationContext authenticationContext,
             UserService userService,
             MailService mailService,
-            PermissionService permissionService,
-            PullRequestService pullRequestService
+            SecurityService securityService,
+            PullRequestService pullRequestService,
+            PermissionAdminService adminService
     ) {
         this.authCtx = authenticationContext;
         this.userService = userService;
         this.mailService = mailService;
-        this.permissionService = permissionService;
+        this.securityService = securityService;
         this.pullRequestService = pullRequestService;
+        this.adminService = adminService;
 
     }
+
+    public class SecurityImpersonate implements Operation<Page<PermittedGroup>, RuntimeException>{
+
+        Repository repository;
+
+        public SecurityImpersonate(Repository _repository) {
+            this.repository = _repository;
+        }
+
+        @Override
+        public Page<PermittedGroup> perform() throws RuntimeException {
+            return adminService.findGroupsWithRepositoryPermission(this.repository, BITBUCKET_REVIEWER_GROUP, new PageRequestImpl(0, 1000));
+        }
+    }
+
 
     @Override
     public void postReceive(RepositoryHookContext context, Collection<RefChange> refChanges) {
@@ -61,15 +80,15 @@ public class ExternalAsyncPostReceiveHook implements AsyncPostReceiveRepositoryH
                 }
 
                 String toBranch = branchName.substring(0, branchName.indexOf(STG_PATTERN.toString()));
+                ApplicationUser adminApplicationUser = userService.getUserByName(BITBUCKET_ADMIN);
+                EscalatedSecurityContext securityContext = securityService.impersonating(adminApplicationUser, "getting repo groups");
+                final Page<PermittedGroup> groupsPage = securityContext.call(new SecurityImpersonate(context.getRepository()));
 
-                Page<String> groupsPage = permissionService.getGrantedGroups(Permission.PROJECT_READ, new PageRequestImpl(0, 100));
-                Iterator<String> tempIter = groupsPage.getValues().iterator();
+                Iterator<PermittedGroup> tempIter = groupsPage.getValues().iterator();
                 Set<String> groupNames = new HashSet<String>();
                 while (tempIter.hasNext()) {
-                    String groupName = tempIter.next();
-                    if (groupName.contains(BITBUCKET_REVIEWER_GROUP)){
-                        groupNames.add(groupName);
-                    }
+                    String groupName = tempIter.next().getGroup();
+                    groupNames.add(groupName);
                 }
 
 
@@ -154,7 +173,7 @@ public class ExternalAsyncPostReceiveHook implements AsyncPostReceiveRepositoryH
 
         try {
 
-            String pullRequestTitle = "[AUTO] Bitbucket Pull Request. From Branch " + refChange.getRefId().substring(REFS_PREFIX.length());
+            String pullRequestTitle = "[AUTO PR] From " + refChange.getRefId().substring(REFS_PREFIX.length());
 
             PullRequest pr = pullRequestService.create(
                     pullRequestTitle,
