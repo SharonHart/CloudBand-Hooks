@@ -141,15 +141,22 @@ public class ExternalAsyncPostReceiveHook implements AsyncPostReceiveRepositoryH
             for (String group : groupNames) {
                 sb.append("{Group = ").append(group).append(". Users = ");
                 Page<ApplicationUser> usersPage = userService.findUsersByGroup(group, new PageRequestImpl(0, 1000));
-
+                boolean userInGroup = false;
                 for (ApplicationUser user : usersPage.getValues()) {
-                    String userName = user.getName();
-                    if (!userName.equals(currentUserName)) {
-                        users.add(userName);
-                        sb.append(userName).append(", ");
+                    if (user.getName().equals(currentUserName)) {
+                        userInGroup = true;
                     }
                 }
-                sb.append("}");
+                if(userInGroup) {
+                    for (ApplicationUser user : usersPage.getValues()) {
+                        String userName = user.getName();
+                        if (!userName.equals(currentUserName)) {
+                            users.add(userName);
+                            sb.append(userName).append(", ");
+                        }
+                    }
+                    sb.append("}");
+                }
             }
 
             sb.append("}");
@@ -205,7 +212,7 @@ public class ExternalAsyncPostReceiveHook implements AsyncPostReceiveRepositoryH
                     .append(refChange.getRefId().substring(REFS_PREFIX.length()));
 
             sendEmailToUser(mailService, log, postReceiveContextId, currentUser.getEmailAddress(), "Bitbucket: Create Pull Request Failure", pullRequestLog.toString());
-
+            log.error("Added reviwers: " + reviewersList.toString());
             log.error(pullRequestLog.toString(), t);
         }
 
